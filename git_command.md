@@ -4,7 +4,7 @@
 
 2. **git init** : make a directory coverted to a git repository
 
-3. **git add <file>** : the file in the directory may be not in the repository. You should use the command `git add <file>` to add the file to the repository
+3. **git add \<file\>** : the file in the directory may be not in the repository. You should use the command `git add <file>` to add the file to the repository
 
 4. **git commit -m 'first commit'**  ：hand in the change (write the cache in file), `-m` reprsents the message you note.
 
@@ -35,6 +35,3 @@
 18.  **git push <remote-host-alias-name> <branch>** : For example, use the command `git push origin master` to push the local repository to the remote repository's branch **master**.
 19.  **git pull <remote-host-alias-name> <branch>** : Use the command `git pull origin master` to pull the remote repository's branch to local repository to keep the local repository updated.
 20.  **git clone <remote-repository-address>** : Use the command `git clone git@github.com:fragementaryworld/HappyNewYear` or `git clone https://github.com/fragementaryworld/HappyNewYear.git` to clone remote repository to the local. 
-
-
-
