@@ -11,7 +11,6 @@
 ```
 
 ---
-<<<<<<< HEAD
 ### URL
 url的编码方式有三类:escape,encodeURL,encodeURLComponent
 可用urllib.parse.urlencode,urllib.parse.quote来编码不支持的字符，如汉字，空格等，其中urlencode对字典进行编码，quote直接对字符串进行编码
@@ -111,4 +110,3 @@ print random.shuffle(items)
     * put(不完全)
     * delete(删除)
     * head(请求头)
->>>>>>> bfa9802150064cff2269161076dce3c2fcf040fb
