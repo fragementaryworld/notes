@@ -1,6 +1,7 @@
 ### 编码与解码
 
-![encode and decode](https://img2018.cnblogs.com/blog/733013/201812/733013-20181222072124440-1244874607.png)
+![encode and decode](https://img2018.cnblogs.com/blog/733013/201812/733013-20181222072124440-1244874607.png)  
+
 
 编码与解码是字符与字节之间的转换，编码类型有unicode,utf-8,gbk,ascii等，而无论什么编码都包含ascii编码。
 关于unicode和utf-X格式的编码关系，粗略地可以认为utf-X是unicode格式的一种特殊类型。实际上在存储utf数据时，内部会自动在Unicode和utf之间进行转换。
@@ -10,6 +11,7 @@
 ```
 
 ---
+<<<<<<< HEAD
 ### URL
 url的编码方式有三类:escape,encodeURL,encodeURLComponent
 可用urllib.parse.urlencode,urllib.parse.quote来编码不支持的字符，如汉字，空格等，其中urlencode对字典进行编码，quote直接对字符串进行编码
@@ -95,3 +97,18 @@ print random.choice(['剪刀', '石头', '布'])
 items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 print random.shuffle(items)
 ```
+=======
+### http
+1. http的请求方式
+    * get 请求
+        * 请求方便
+        * 不安全，明文
+        * 参数长度有限制
+    * post 请求
+        * 比较安全
+        * 数据整体没有限制
+        * 上传文件
+    * put(不完全)
+    * delete(删除)
+    * head(请求头)
+>>>>>>> bfa9802150064cff2269161076dce3c2fcf040fb
