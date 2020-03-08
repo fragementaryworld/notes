@@ -96,17 +96,54 @@ print random.choice(['剪刀', '石头', '布'])
 items = [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]
 print random.shuffle(items)
 ```
-=======
-### http
-1. http的请求方式
-    * get 请求
-        * 请求方便
-        * 不安全，明文
-        * 参数长度有限制
-    * post 请求
-        * 比较安全
-        * 数据整体没有限制
-        * 上传文件
-    * put(不完全)
-    * delete(删除)
-    * head(请求头)
+
+---
+### ip代理
+
+本地客户端与服务器不直接连接，代理服务器连接,客户端向代理服务器发送http报文，代理服务器再向服务器发送http报文
+代理分为:透明代理，匿名代理，高匿代理。使用透明代理时，服务器知道客户端ip，而匿名代理，服务器不知道客户端ip，但知道客户端使用了代理，而高匿代理，服务器既不知道客户端ip，也不知道其使用了代理。
+代理类型由remote_addr,x-forward-for(xff),via决定
+* REMOTE_ADDR
+  REMOTE_ADDR表示客户端的IP，但是它的值不是由客户端提供的，而是服务器根据客户端的IP指定的。 
+  如果使用浏览器直接访问某个网站，那么网站的web服务器（Nginx、Apache等）就会把REMOTE_ADDR设为客户端的IP地址。
+  如果我们给浏览器设置代理，我们访问目标网站的请求会先经过代理服务器，然后由代理服务器将请求转化到目标网站。那么网站的web代理服务器就会把REMOTE_ADDR设为代理服务器的IP。
+* X-Forwarded-For（XFF）
+  X-Forwarded-For是一个HTTP扩展头部，用来表示HTTP请求端真实IP。当客户端使用了代理时，web代理服务器就不知道客户端的真实IP地址。为了避免这个情况，代理服务器通常会增加一个X-Forwarded-For的头信息，把客户端的IP添加到头信息里面。
+  X-Forwarded-For请求头格式如下：
+  X-Forwarded-For:client,proxy1,proxy2
+  client表示客户端的IP地址；proxy1是离服务端最远的设备IP;proxy2是次级代理设备的IP；从格式中，可以看出从client到server是可以有多层代理的。
+  如果一个HTTP请求到达服务器之前，经过了三个代理Proxy1、Proxy2、Proxy3，IP分别为IP1、IP2、IP3，用户真实IP为IP0，那么按照XFF标准，服务端最终会收到以下信息：
+  X-Forwarded-For:IP0,IP1,IP2
+  Proxy3直连服务器，它会给XFF追加IP2，表示它是在帮Proxy2转发请求。列表中并没有IP3，IP3可以在服务端通过RemoteAddress字段获得。我们知道HTTP连接基于TCP连接，HTTP协议中没有IP的概念，RemoteAddress来自TCP连接，表示与服务端建立TCP连接的设备IP，在这个例子里就是IP3。
+* HTTP_VIA
+  via是HTTP协议里面的一个header,记录了一次HTTP请求所经过的代理和网关，经过1个代理服务器，就添加一个代理服务器的信息，经过2个就添加2个。
+
+---
+### handle
+`urllib.request.urlopen(url)`底层是先构造一个处理器handle，再构造一个访问器opener，通过opener打开url
+```python
+#!/usr/bin/python3
+import urllib.request
+
+url="https://blog.csdn.net/cpongo1/article/details/89533131"
+handler=urllib.request.HTTPHandler()
+opener=urllib.request.build_opener(handler)
+response=opener.open(url)
+data=response.read().decode()
+with open("4.html","x",encoding="utf-8") as f:
+        f.write(data)
+```
+添加代理ip
+```python
+#!/usr/bin/python3
+import urllib.request
+
+url="https://blog.csdn.net/cpongo1/article/details/89533131"
+proxy={"http":"https://117.88.177.52:3000"}
+handler=urllib.request.ProxyHandler(proxy)
+opener=urllib.request.build_opener(handler)
+response=opener.open(url)
+data=response.read().decode()
+with open("5.html","w",encoding="utf-8") as f:
+        f.write(data)
+```
