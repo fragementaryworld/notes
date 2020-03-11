@@ -147,3 +147,126 @@ data=response.read().decode()
 with open("5.html","w",encoding="utf-8") as f:
         f.write(data)
 ```
+
+---
+### proxy认证
+```python
+  1 #!/usr/bin/python3
+  2 
+  3 import urllib.request
+  4 
+  5 ##way 1
+  6 #url="http://www.imcaviare.com/2018-12-18-1/"
+  7 #proxy={"http":"usrname:passwd@19.168.1.1:8080"}
+  8 #handle=urllib.request.ProxyHandler(proxy)
+  9 #opener=urllib.request.build_opener(handle)
+ 10 #opener.open(url)
+ 11 
+ 12 #way 2
+ 13 url="http://www.baidu.com"
+ 14 uri="123.11.22.1:8080"
+ 15 name="username"
+ 16 passwd="passwd"
+ 17 manager=urllib.request.HTTPPasswordMgrWithDefaultRealm()
+ 18 manager.add_password(None,uri,name,passwd)
+ 19 handler=urllib.request.ProxyBasicAuthHandler(manager)
+ 20 opener=urllib.request.build_opener(handler)
+ 21 data=opener.open(url)
+ 22 print(data.read().decode())
+```
+
+---
+### http认证
+
+```python
+  1 #!/usr/bin/python3
+  2 
+  3 import urllib.request
+  4 
+  5 ##way 1
+  6 #url="http://www.imcaviare.com/2018-12-18-1/"
+  7 #proxy={"http":"usrname:passwd@19.168.1.1:8080"}
+  8 #handle=urllib.request.ProxyHandler(proxy)
+  9 #opener=urllib.request.build_opener(handle)
+ 10 #opener.open(url)
+ 11 
+ 12 #way 2
+ 13 url="http://www.baidu.com"
+ 14 uri="123.11.22.1:8080"
+ 15 name="username"
+ 16 passwd="passwd"
+ 17 manager=urllib.request.HTTPPasswordMgrWithDefaultRealm()
+ 18 manager.add_password(None,uri,name,passwd)
+ 19 handler=urllib.request.ProxyBasicAuthHandler(manager)
+ 20 opener=urllib.request.build_opener(handler)
+ 21 data=opener.open(url)
+ 22 print(data.read().decode())
+```
+
+---
+### Cookie
+
+1. Cookie登陆
+```python
+  1 #!/usr/bin/python3
+  2 import urllib.request
+  3 url="https://www.yaozh.com/member"
+  4 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (K    HTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36","Cookie":"think_langua    ge=en-US; _ga=GA1.2.1104644017.1583903706; _gid=GA1.2.860684517.1583903706;     acw_tc=2f624a5615839037133273241e7ee1af6db0be05482e943933f31475bd179e; PHPSE    SSID=qo9kn6dn09h86dk8da50rlun23; yaozh_logintime=1583904632; yaozh_user=8906    05%09wyname; yaozh_userId=890605; yaozh_jobstatus=kptta67UcJieW6zKnFSe2JyXno    aZcJVrlZmHnKZxanJT1qeSoMZYoNdzbZtaqdzTw87Jhpyqn26fhtHCpquUrJrOnlNu1HCWlHNZkm    1qlp64B1b841Eb104E05Ff309d8Ea6F37431DSlZqXk1mgqJ%2BYn4OnoKKdU5ysa2SUcIeVbm%2    BUcWKXm5WUlZ2TWaCy6bee4e68fdf17cd0aa9b721baf3dfff7; _gat=1; Hm_lpvt_65968db3    ac154c3089d7f9a4cbb98c94=1583904635; yaozh_uidhas=1; yaozh_mylogin=158390463    7; acw_tc=2f624a5615839037133273241e7ee1af6db0be05482e943933f31475bd179e; Hm    _lvt_65968db3ac154c3089d7f9a4cbb98c94=1583903706%2C1583903718%2C1583904447"}
+  5 req=urllib.request.Request(url,headers=headers)
+  6 response=urllib.request.urlopen(req)
+  7 data=response.read().decode()
+  8 with open("1.html","w",encoding="utf-8") as f:
+  9         f.write(data)
+
+```
+
+2. 获取Cookie
+* 通过浏览器获取，可能会有时效性
+* 代码登录直接获取
+> * 采用http.cookiejar库中的CookieJar类来自动保存cookie
+> * 登录页面为get请求的url，可能会与post请求的url不同，故可向在浏览器检查选项中添加preserve log选项，登录后查看post请求url与其post数据，注意post数据为请求前（即填写时）的数据，需要在登录页面查找
+> * 注意post请求的数据为需要转换为bytes形式，即与网络的数据交流均为bytes形式的数据，用`urllib.parse.urlencode(dict).encode()`
+```python
+  1 #!/usr/bin/python3
+  2 import urllib.request
+  3 import http.cookiejar
+  4 import urllib.parse
+  5 
+  6 # get Cookie
+  7 login_url="https://www.yaozh.com/login"
+  8 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Ge    cko) Chrome/80.0.3987.132 Safari/537.36"}
+  9 post_data={"username":"wyname","pwd":"ChEnGjUn20000204","formhash":"AD1A063EC2","backurl"    :"https%3A%2F%2Fwww.yaozh.com%2F"}
+ 10 login_data=urllib.parse.urlencode(post_data).encode()
+ 11 cookie=http.cookiejar.CookieJar()
+ 12 cookie_handler=urllib.request.HTTPCookieProcessor(cookie)
+ 13 opener=urllib.request.build_opener(cookie_handler)
+ 14 req=urllib.request.Request(login_url,headers=headers,data=login_data)
+ 15 opener.open(req)
+ 16 
+ 17 # spider
+ 18 center_url="https://www.yaozh.com/member"
+ 19 req2=urllib.request.Request(center_url,headers=headers)
+ 20 response=opener.open(req2)
+ 21 data=response.read().decode()
+ 22 with open("2.html","w",encoding="utf-8") as f:
+ 23         f.write(data)
+~                               
+```
+
+### requests
+```python
+  1 #!/usr/bin/python3
+  2 import requests
+  3 url="http://www.baidu.com"
+  4 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (K    HTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+  5 response=requests.get(url,headers=headers)
+  6 #print(response.content)  bytes格式的网页代码
+  7 #print(response.text)     unicode格式的网页代码
+  8 #print(response.request.headers)    请求头
+  9 #print(response.headers)           响应头
+ 10 #print(response.status_code)       http状态马
+ 11 #print(response.request._cookies)   请求头Cookie
+ 12 #print(response.cookies)            响应头Cookie
+ 13 #print(response.url)               URL
+```
+> requests能直接编码url，无需将url用urllib.parse.urlencode或quote编码，同样post请求中，data可直接用字典传入，无需先urlencode再encode
