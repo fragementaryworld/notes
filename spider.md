@@ -254,6 +254,8 @@ with open("5.html","w",encoding="utf-8") as f:
 ```
 
 ### requests
+#### get
+1. get基本数据
 ```python
   1 #!/usr/bin/python3
   2 import requests
@@ -270,3 +272,79 @@ with open("5.html","w",encoding="utf-8") as f:
  13 #print(response.url)               URL
 ```
 > requests能直接编码url，无需将url用urllib.parse.urlencode或quote编码，同样post请求中，data可直接用字典传入，无需先urlencode再encode
+
+2. auth认证
+```python
+  1 #!/usr/bin/python3
+  2 #内网认证
+  3 import requests
+  4 url="https://api.github.com/user"
+  5 auth=("user","pass")
+  6 response=requests.get(url,auth=auth)
+  7 print(response.json())
+```
+
+3.  CA认证
+
+```python
+  1 #!/usr/bin/python3
+  2 #忽略https的第三方CA证书验证
+  3 import requests
+  4 url="https://www.12306.cn/mormhweb"
+  5 headers={"heades":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+  6 response=requests.get(url,headers=headers,verify=False)
+```
+
+4. proxy
+
+```python
+  1 #!/usr/bin/python3
+  2 
+  3 import requests
+  4 url="https://www.baidu.com"
+  5 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+  6 proxy={"http":"39.91.8.31:9999"}
+  7 response=requests.get(url=url,headers=headers,proxies=proxy)
+  8 print(response.status_code)
+```
+
+5. cookie
+```python
+  1 #!/usr/bin/python3
+  2 
+  3 import requests
+  4 
+  5 url="https://www.yaozh.com/member"
+  6 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+  7 cookies="PHPSESSID=87hj7u937kvfo8b9ankdunpvi0; acw_tc=2f624a7415839939326077181e553956b1536c2f5b7f2ff7cd3484816faf8b; _ga=GA1.2.2042711227.1583993934; _gid=GA1.2.1775963643.1583993934; _gat=1; Hm_lpvt    _65968db3ac154c3089d7f9a4cbb98c94=1583993934; yaozh_logintime=1583993935; yaozh_user=890605%09wyname; yaozh_userId=890605; yaozh_jobstatus=kptta67UcJieW6zKnFSe2JyXnoaZcJVrlZmHnKZxanJT1qeSoMZYoNdzbZtaq    dzTw87Jhpyqn26fhtHCpquUrJrOnlNu1HCWlHNZkm1qlp6c4C34953716A62e2f41E73B32CE8b87AUk5qVlVmgqJ%2BYn4OnoKKdU5ysa2SUcIeVbm%2BUcWuWnpWXnZyYWaCya86b1cc1141321b68d4cf41965d34bbf; db_w_auth=757711%09wyname; UtzD    _f52b_saltkey=v44mqm4m; UtzD_f52b_lastvisit=1583990336; UtzD_f52b_lastact=1583993936%09uc.php%09; UtzD_f52b_auth=c947zAoDLx4kubWW3CcPhhHRHwMITmcxK7g9lZDwQTSKGK8Cc6PM0PR2EzN27WJm%2BFJKrhkMiRqmRV4t2%2FY    D2HWHWLU; yaozh_uidhas=1; yaozh_mylogin=1583993938; acw_tc=2f624a7415839939326077181e553956b1536c2f5b7f2ff7cd3484816faf8b; Hm_lvt_65968db3ac154c3089d7f9a4cbb98c94=1583903718%2C1583904447%2C1583910831%    2C1583993934"
+  8 cookie_list=cookies.split(";")
+  9 cookie_dict={}
+ 10 for cookie in cookie_list:
+ 11         cookie_dict[cookie.split("=")[0]]=cookie.split("=")[1]
+ 12 response=requests.get(url=url,headers=headers,cookies=cookie_dict)
+ 13 data=response.content.decode()
+ 14 with open("1.html","w",encoding="utf-8") as f:
+ 15         f.write(data)
+```
+> 注意此处要求的cookies参数是字典，需要将网页上字符串的形式处理成字典，可用正则或字符串处理工具
+
+#### post
+```python
+  1 #!/usr/bin/python3
+  2 
+  3 import requests
+  4 
+  5 url="https://www.yaozh.com/member"
+  6 login_url="https://www.yaozh.com/login"
+  7 login_data={"username": "wyname","pwd": "ChEnGjUn20000204","formhash": "812831FB13","backurl": "%2F%2Fwww.yaozh.com"}
+  8 # login_data={"username": "wyname","pwd": "ChEnGjUn20000204","formhash": "812831FB13","backurl": "https%3A%2F%2Fwww.yaozh.com%2F"}
+  9 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+ 10 session=requests.session()
+ 11 session.post(login_url,data=login_data,headers=headers)
+ 12 response=session.get(url,headers=headers)
+ 13 data=response.content.decode()
+ 14 with open("2.html","w",encoding="utf-8") as f:
+ 15         f.write(data)
+~                                     
+```
+
