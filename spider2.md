@@ -2,6 +2,8 @@
 
 ### Regular Expression
 
+![re](https://img-blog.csdn.net/20140929200042391?watermark/2/text/aHR0cDovL2Jsb2cuY3Nkbi5uZXQvbGlzb25nbGlzb25nbGlzb25n/font/5a6L5L2T/fontsize/400/fill/I0JBQkFCMA==/dissolve/70/gravity/SouthEast)
+
 1. re.S,re.M,re.I
 
 ```python
@@ -186,4 +188,79 @@ print(s2)
 # 输出结果：
 # I love you, do you love me?
 # I LIKE you, do you LIKE me?
+```
+
+---
+### LXML
+
+```python
+ 1 #!/usr/bin/python3
+  2 import requests
+  3 from lxml import etree
+  4 url="https://news.baidu.com/"
+  5 headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+  6 data=requests.get(url,headers=headers).content.decode()
+  7 html=etree.HTML(data)
+  8 result=html.xpath("/html/head/title/text()")
+  9 result=html.xpath('//a[@mon="ct=1&a=1&c=top&pn=0"]/text()')
+ 10 result=html.xpath('//a[@mon="ct=1&a=1&c=top&pn=0"]/@href')
+ 11 print(result)
+
+```
+
+|路径表达式|结果|
+|--------|----|
+|bookstore	|选取 bookstore 元素的所有子节点。
+|/bookstore	| 选取根元素 bookstore。注释：假如路径起始于正斜杠( / ),则此路径始终代表到某元素的绝对路径！|
+|bookstore/book|选取属于 bookstore 的子元素的所有 book 元素。|
+|//book|选取所有 book 子元素，而不管它们在文档中的位置。|
+|bookstore//book	|选择属于 bookstore 元素的后代的所有 book 元素，而不管它们位于 bookstore 之下的什么位置。|
+|//@lang	|选取名为 lang 的所有属性。|
+|/bookstore/book[1]	|选取属于 bookstore 子元素的第一个 book 元素。|
+|/bookstore/book[last()]|	选取属于 bookstore 子元素的最后一个 book 元素。|
+|/bookstore/book[last()-1]	|选取属于 bookstore 子元素的倒数第二个 book 元素。|
+|/bookstore/book[position() < 3]	|选取最前面的两个属于 bookstore 元素的子元素的 book 元素。|
+|//title[@lang]	|选取所有拥有名为 lang 的属性的 title 元素。|
+|//title[@lang='eng']	|选取所有 title 元素，且这些元素拥有值为 eng 的 lang 属性。|
+|/bookstore/book[price>35.00]	|选取 bookstore 元素的所有 book 元素，且其中的 price 元素的值须大于 35.00。|
+|/bookstore/book[price>35.00]/title|	选取 bookstore 元素中的 book 元素的所有 title 元素，且其中的 price 元素的值须大于 35.00。|
+
+
+```python
+  1 #!/usr/bin/python3
+  2 from lxml import etree
+  3 import requests
+  4 import json
+  5 
+  6 class ForumSpider(object):
+  7         def __init__ (self):
+  8                 self.baseurl="https://daily.zhihu.com"
+  9                 self.headers={"User-agent":"Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.132 Safari/537.36"}
+ 10         def request_data(self,url):
+ 11                 response=requests.get(url,headers=self.headers)
+ 12                 return response.content.decode()
+ 13         def parse_data(self,data):
+ 14                 html=etree.HTML(data)
+ 15                 title_list=html.xpath('//span[@class="title"]/text()')
+ 16                 url_list=html.xpath('//a[@class="link-button"]/@href')
+ 17                 data_list=[]
+ 18                 for index,item in enumerate(title_list):
+ 19                         dic={}
+ 20                         dic["name"]=item
+ 21                         dic["url"]=self.baseurl+url_list[index]
+ 22                         data_list.append(dic)
+ 23                 return data_list
+ 24         def save_data(self,data):
+ 25                 js_data=json.dumps(data)
+ 26                 with open("1.json","w",encoding="utf-8") as f:
+ 27                         f.write(js_data)
+ 28         def run(self):
+ 29                 url=self.baseurl
+ 30                 data=self.request_data(url)
+ 31                 data_list=self.parse_data(data)
+ 32                 self.save_data(data_list)
+ 33 
+ 34 case=ForumSpider()
+ 35 case.run()
+
 ```
