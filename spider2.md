@@ -264,3 +264,201 @@ print(s2)
  35 case.run()
 
 ```
+
+> `//div[contains(@id,"normalthread")]`,xpath中的模糊查询，寻找id属性含有normalthread字段的div节点。
+
+---
+### bs4
+
+bs4 能自动补全缺失的html
+
+```python
+#!/usr/bin/python3
+
+import bs4 
+
+html_doc = """ 
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="title"><b>The Dormouse's story</b></p>
+
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+
+<p class="story">...</p>
+"""
+
+soup=bs4.BeautifulSoup(html_doc,"lxml")
+
+# 几个简单的浏览结构化数据的方法:
+soup.title
+# <title>The Dormouse's story</title>
+
+soup.title.name
+# u'title'
+
+soup.title.string
+# u'The Dormouse's story'
+
+soup.title.parent.name
+# u'head'
+
+soup.p
+# <p class="title"><b>The Dormouse's story</b></p>
+
+soup.p['class']
+# u'title'
+
+soup.a
+# <a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>
+
+soup.find_all('a')
+# [<a class="sister" href="http://example.com/elsie" id="link1">Elsie</a>,
+#  <a class="sister" href="http://example.com/lacie" id="link2">Lacie</a>,
+#  <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>]
+
+soup.find(id="link3")
+# <a class="sister" href="http://example.com/tillie" id="link3">Tillie</a>
+
+# 从文档中找到所有<a>标签的链接:
+
+for link in soup.find_all('a'):
+    print(link.get('href'))
+    # http://example.com/elsie
+    # http://example.com/lacie
+    # http://example.com/tillie
+
+# 从文档中获取所有文字内容:
+
+print(soup.get_text())
+# The Dormouse's story
+#
+# The Dormouse's story
+#
+# Once upon a time there were three little sisters; and their names were
+# Elsie,
+# Lacie and
+# Tillie;
+# and they lived at the bottom of a well.
+#
+# ...
+```
+
+> `soup.p`为第一个p标签
+
+bs4中的四个对象BeautifulSoup,Tag,NavigableString,Comment
+
+```python
+  1 #!/usr/bin/python3
+  2 import bs4
+  3 
+  4 html_doc = """
+  5 <html><head><title>The Dormouse's story</title></head>
+  6 <body>
+  7 <p class="story"><!--Hey, buddy. Want to buy a used parser?--></p>
+  8 
+  9 <p class="title"><b>The Dormouse's story</b></p>
+ 10 
+ 11 <p class="story">Once upon a time there were three little sisters; and their names were
+ 12 <a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+ 13 <a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+ 14 <a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+ 15 and they lived at the bottom of a well.</p>
+ 16 
+ 17 """
+ 18 soup=bs4.BeautifulSoup(html_doc,"lxml")
+ 19 print(type(soup))
+ 20 print(type(soup.a))
+ 21 print(type(soup.a.string))
+ 22 print(type(soup.p.string))
+# <class 'bs4.BeautifulSoup'>
+# <class 'bs4.element.Tag'>
+# <class 'bs4.element.NavigableString'>
+# <class 'bs4.element.Comment'>
+
+```
+
+常用函数find,find_all,select_one,select
+
+```python
+#!/usr/bin/python3
+import bs4
+
+html_doc = """
+<html><head><title>The Dormouse's story</title></head>
+<body>
+<p class="story"><!--Hey, buddy. Want to buy a used parser?--></p>
+
+<p class="title"><b>The Dormouse's story</b></p>
+
+<p class="story">Once upon a time there were three little sisters; and their names were
+<a href="http://example.com/elsie" class="sister" id="link1">Elsie</a>,
+<a href="http://example.com/lacie" class="sister" id="link2">Lacie</a> and
+<a href="http://example.com/tillie" class="sister" id="link3">Tillie</a>;
+and they lived at the bottom of a well.</p>
+
+"""
+# find查找符合条件的第一个标签
+soup = bs4.BeautifulSoup(html_doc)
+soup.find(name="p",attrs={"class":"story"})
+# <p class="story"><!--Hey, buddy. Want to buy a used parser?--></p>
+# find_all 查找符合条件的所有标签，返回列表
+soup.find_all(name="a",limit=2)
+soup.find_all(attrs={"class":"sister"})
+# select_one  css selector
+soup.select_one(".sister")
+# select
+soup.select(".sister",limit=2)
+```
+
+**css3 选择器**
+
+|选择器	|例子	|例子描述	|CSS|
+|------|------|----------|---|
+|.class|.intro|	选择 class="intro" 的所有元素|1|
+|#id|#firstname选择 id="firstname" 的所有元素|1|
+|* | * | 选择所有元素|2|
+|element|p|选择所有 < p > 元素|1|
+|element,element|div,p|选择所有 < div > 元素和所有 < p > 元素|1|
+|element element|div p|	选择 < div > 元素内部的所有 < p > 元素|1|
+|element>element|div>p|选择父元素为 < div > 元素的所有 < p > 元素|2|
+|element+element|div+p|选择紧接在 < div > 元素之后的所有 < p > 元素|2|
+|[attribute]|[target]|选择带有 target 属性所有元素|2|
+|[attribute=value]|[target=_blank]|选择 target="_blank" 的所有元素|2|
+|[attribute~=value]|[title~=flower]|选择 title 属性包含单词 "flower" 的所有元素|2|
+|[attribute|=value]|[lang|=en]|选择 lang 属性值以 "en" 开头的所有元素|2|
+|:link|a:link|选择所有未被访问的链接|1|
+|:visited|a:visited|选择所有已被访问的链接|1|
+|:active|a:active|选择活动链接|1|
+|:hover|a:hover|选择鼠标指针位于其上的链接|1|
+|:focus|input:focus|选择获得焦点的 input 元素|2|
+|:first-letter|p:first-letter|选择每个 < p > 元素的首字母|1|
+|:first-line|p:first-line|选择每个 < p > 元素的首行|1|
+|:first-child|p:first-child|选择属于父元素的第一个子元素的每个 < p > 元素|2|
+|:before|p:before|在每个 < p > 元素的内容之前插入内容|2|
+|:after|p:after|在每个 < p > 元素的内容之后插入内容|2|
+|:lang(language)|p:lang(it)|选择带有以 "it" 开头的 lang 属性值的每个 < p > 元素|2|
+|element1~element2|p~ul|选择前面有 < p > 元素的每个 < ul > 元素|3|
+|[attribute^=value]|a[src^="https"]|选择其 src 属性值以 "https" 开头的每个 < a > 元素|3|
+|[attribute$=value]|a[src$=".pdf"]|选择其 src 属性以 ".pdf" 结尾的所有 < a > 元素|3|
+|[attribute*=value]|a[src*="abc"]|选择其 src 属性中包含 "abc" 子串的每个 < a > 元素|3|
+|:first-of-type|p:first-of-type|选择属于其父元素的首个 < p > 元素的每个 < p > 元素|3|
+|:last-of-type|p:last-of-type|选择属于其父元素的最后 < p > 元素的每个 < p > 元素|3|
+|:only-of-type|p:only-of-type|选择属于其父元素唯一的 < p > 元素的每个 < p > 元素|3|
+|:only-child|p:only-child|选择属于其父元素的唯一子元素的每个 < p > 元素|3|
+|:nth-child(n)|p:nth-child(2)|选择属于其父元素的第二个子元素的每个 < p > 元素|3|
+|:nth-last-child(n)|p:nth-last-child(2)|同上，从最后一个子元素开始计数|3|
+|:nth-of-type(n)|p:nth-of-type(2)|选择属于其父元素第二个 < p > 元素的每个 < p > 元素|3|
+|:nth-last-of-type(n)|p:nth-last-of-type(2)|同上，但是从最后一个子元素开始计数|3|
+|:last-child|p:last-child|选择属于其父元素最后一个子元素每个 < p > 元素|3|
+|:root|:root|选择文档的根元素|3|
+|:empty|p:empty|选择没有子元素的每个 < p > 元素（包括文本节点）|3|
+|:target|#news:target|选择当前活动的 #news 元素|3|
+|:enabled|input:enabled|选择每个启用的 < input > 元素|3|
+|:disabled|input:disabled|选择每个禁用的 < input > 元素|3|
+|:checked|input:checked|选择每个被选中的 < input > 元素|3|
+|:not(selector)|:not(p)|选择非 < p > 元素的每个元素|3|
+|::selection|::selection|选择被用户选取的元素部分|3|
