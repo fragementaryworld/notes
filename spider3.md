@@ -45,6 +45,7 @@ g.writelines(f.readlines(f))
 ```
 
 ### csv
+
 ```python
 # 读取csv文件
 import csv
@@ -95,3 +96,57 @@ with open("2.csv","w") as f:
     writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})
 ```
 > 使用DictReader,DictWriter方法读写csv文件时，将整个文件看一个大列表，每行看作其中的元素，其中首行看为一个列表，为表头，其余行看为一个字典，字典的keys为首行，values为该行以“，”分割的字符段组成的列表。
+
+---
+### MongoDB
+
+1. 数据库
+
+```mongodb
+use DATABASE_NAME #如果数据库不存在，则创建数据库，否则切换到指定数据库。
+show dbs # 查看现存数据库
+db.dropDatabase() # 删除当前数据库
+```
+
+> 注意: 在 MongoDB 中，集合只有在内容插入后才会创建! 就是说，创建集合(数据表)后要再插入一个文档(记录)，集合才会真正创建。
+
+2. 集合
+
+```mongodb
+db.createCollection(name, options) # 在当前数据库下创建集合
+show collections # 查看当前数据库下所有集合
+db.collection.drop() # 删除指定集合collection
+db.COLLECTION_NAME.insert(document) # 在当前集合中插入文档
+db.col.insert({title: 'MongoDB 教程', 
+    description: 'MongoDB 是一个 Nosql 数据库',
+    by: '菜鸟教程',
+    url: 'http://www.runoob.com',
+    tags: ['mongodb', 'database', 'NoSQL'],
+    likes: 100
+})
+db.col.find() # 查看col集合下所有文档信息
+```
+
+3. 文档
+
+* 更新文档
+
+```mongodb
+db.collection.update(
+   <query>,
+   <update>,
+   {
+     upsert: <boolean>,
+     multi: <boolean>,
+     writeConcern: <document>
+   }
+)
+```
+
+`query` : update的查询条件，类似sql update查询内where后面的。
+`update` : update的对象和一些更新的操作符（如$,$inc...）等，也可以理解为sql update查询内set后面的
+`upsert` : 可选，这个参数的意思是，如果不存在update的记录，是否插入objNew,true为插入，默认是false，不插入。
+`multi` : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
+`writeConcern` :可选，抛出异常的级别。
+
+`db.col.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}},{multi:true})`
