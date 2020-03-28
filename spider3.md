@@ -102,7 +102,7 @@ with open("2.csv","w") as f:
 
 1. 数据库
 
-```mongodb
+```js
 use DATABASE_NAME #如果数据库不存在，则创建数据库，否则切换到指定数据库。
 show dbs # 查看现存数据库
 db.dropDatabase() # 删除当前数据库
@@ -112,7 +112,7 @@ db.dropDatabase() # 删除当前数据库
 
 2. 集合
 
-```mongodb
+```js
 db.createCollection(name, options) # 在当前数据库下创建集合
 show collections # 查看当前数据库下所有集合
 db.collection.drop() # 删除指定集合collection
@@ -129,9 +129,20 @@ db.col.find() # 查看col集合下所有文档信息
 
 3. 文档
 
+* 插入文档
+`db.col.insert({name:"Jack",age:12,is_male:true})`
+
+* 删除文档
+`db.col.remove({name:"Jack"})`
+删除符合条件的所有文档
+`db.col.remove({name:"Jack"},{justOne:true})`
+删除符合条件的第一个文档
+`db.col.remove({})`
+删除col集合下的所有文档
+
 * 更新文档
 
-```mongodb
+```js
 db.collection.update(
    <query>,
    <update>,
@@ -149,4 +160,27 @@ db.collection.update(
 `multi` : 可选，mongodb 默认是false,只更新找到的第一条记录，如果这个参数为true,就把按条件查出来多条记录全部更新。
 `writeConcern` :可选，抛出异常的级别。
 
-`db.col.update({'title':'MongoDB 教程'},{$set:{'title':'MongoDB'}},{multi:true})`
+`db.col.update({title:'MongoDB 教程'},{$set:{title:'MongoDB'}},{multi:true})`
+修改符合条件文档的对应属性
+`db.col.update({title:'MongoDB 教程'},{$unset:{title:""}},{multi:true})`
+删除符合查询条件的文档的对应属性
+
+* 查询
+    * `db.col.find({age=12})`
+查询符合条件的文档
+    * `db.col.findOne({age=12})`
+查询符合条件的第一个文档
+    * `比较运算`：`db.col.find({age:{$ge:18}})`
+age属性大于18的值的文档，此只对数值型有效，除此之外，还有gte,le,lte,ne
+    * `逻辑运算`:`db.col.find({$and:[{age:{$gt:18}},{is_male:true}])`,与`db.col.find({age:{$gt:18},is_male:true})`相同,均为查找age大于18且is_male为true的文档,初次之外,还有or. 
+    **`db.col.find({$and:[{$or:[{age:{$ge:18},{like:"cat"}]},{is_male:false}]})`**
+    * `范围查询` : `db.col.find({age:{$in:[12,13,14]}})`,age为12、13、14的文档，`db.col.find({age:{$in:[12,13,14]}})`
+    * `正则查询`:`db.col.find({name:{$regex:"^J",查找age以J,j开头的文档，i表示忽略大小写，$options:"i"}})`,`db.col.find({name:/^J/i})`
+    * `函数查询`
+    ```javascript
+    db.col.find({
+        $where:function(){
+            return this.age>18
+        }
+    })
+    ```
